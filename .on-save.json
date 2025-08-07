@@ -1,0 +1,17 @@
+[
+  {
+    "files": [
+      "main.go",
+      "packages/**/*.go",
+      ".air.toml",
+      "Dockerfile",
+      "helpers/*.sh",
+      ".release/defaults/test.config.hcl",
+      ".release/defaults/example.config.hcl",
+      ".github/workflows/build-and-release.yml"
+    ],
+    "command": "./helpers/onsave.service-seed.sh",
+    "showOutput": "true",
+    "showError": "false"
+  }
+]
