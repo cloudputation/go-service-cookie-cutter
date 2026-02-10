@@ -19,7 +19,6 @@ func StartServer() {
   l.Info("Starting server on port %s", serverPort)
 
   http.HandleFunc("/v1/health", v1.HealthHandler)
-  http.HandleFunc("/v1/system/status", v1.SystemStatusHandlerWrapper)
   http.Handle("/v1/system/metrics", promhttp.Handler())
 
   err := http.ListenAndServe(serverPort, nil)

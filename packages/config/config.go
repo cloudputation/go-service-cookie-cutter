@@ -14,7 +14,7 @@ type Configuration struct {
     LogDir      string      `hcl:"log_dir"`
     DataDir     string      `hcl:"data_dir"`
     Server      Server      `hcl:"server,block"`
-    Consul      Consul      `hcl:"consul,block"`
+    Telemetry   *Telemetry  `hcl:"telemetry,block"`
 }
 
 type Server struct {
@@ -22,21 +22,11 @@ type Server struct {
     ServerAddress string `hcl:"address"`
 }
 
-type Consul struct {
-    ConsulHost  string `hcl:"consul_host"`
-    ConsulToken string `hcl:"consul_token"`
-}
-
 
 var AppConfig Configuration
 var ConfigPath string
 var RootDir string
 const MaxWorkers = 10
-
-var (
-    ConsulDataDir       = "service-seed::Data"
-    ConsulSystemDataDir = ConsulDataDir + "/system"
-)
 
 
 func LoadConfiguration() error {
@@ -70,9 +60,19 @@ func LoadConfiguration() error {
       return fmt.Errorf("Failed to apply configuration: %v", diags)
   }
 
+  // Apply defaults for any missing optional values
+  applyDefaults()
+
   return nil
 }
 
 func GetConfigPath() string {
   return ConfigPath
+}
+
+// DEFAULT CONFIGURATION SETTINGS
+//
+// applyDefaults sets default values for optional configuration fields
+func applyDefaults() {
+  applyTelemetryDefaults()
 }

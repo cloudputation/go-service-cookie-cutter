@@ -1,82 +1,86 @@
 # Application Boilerplate
 
-## Overview
-This project provides a modular boilerplate for Go applications with a focus on service orchestration, configuration, metrics, logging, and extensible CLI/API patterns. Each core module is documented below.
+Go service boilerplate with production-ready patterns: modular packages, HCL configuration, OpenTelemetry observability, and multi-registry Docker deployment.
 
-## Table of Contents
-- [api](./packages/api/README.md)
-- [bootstrap](./packages/bootstrap/README.md)
-- [cli](./packages/cli/README.md)
-- [config](./packages/config/README.md)
-- [logger](./packages/logger/README.md)
-- [stats](./packages/stats/README.md)
+## Quick Start
 
----
+```bash
+# Build the application
+make build
 
-## Module Summaries
+# Run locally
+make local-deploy
 
-### [api](./packages/api/README.md)
-- **Purpose:** HTTP API endpoints for health, system status, and metrics.
-- **Exports:** `StartServer()`, `HealthHandler`, `SystemStatusHandler`, `SystemStatusHandlerWrapper`.
-- **Interactions:** Uses `config`, `logger`, `stats`, `consul`.
-- **Example:**
-  ```go
-  import "github.com/organization/service-seed/packages/api"
-  api.StartServer()
-  ```
+# See all available commands
+make help
+```
 
-### [bootstrap](./packages/bootstrap/README.md)
-- **Purpose:** Initializes and bootstraps the filesystem agent and Consul state.
-- **Exports:** `BootstrapFileSystem()`
-- **Interactions:** Uses `config`, `consul`, `logger`, `stats`.
-- **Example:**
-  ```go
-  import "github.com/organization/service-seed/packages/bootstrap"
-  err := bootstrap.BootstrapFileSystem()
-  ```
+## What's Inside
 
-### [cli](./packages/cli/README.md)
-- **Purpose:** Command-line interface for config validation, agent startup, and system status.
-- **Exports:** `SetupRootCommand()`
-- **Interactions:** Uses `bootstrap`, `api`, `logger`, `stats`, `config`.
-- **Example:**
-  ```go
-  import "github.com/organization/service-seed/packages/cli"
-  rootCmd := cli.SetupRootCommand()
-  rootCmd.Execute()
-  ```
+**Configuration** - HCL-based config with sensible defaults and environment variable overrides
 
-### [config](./packages/config/README.md)
-- **Purpose:** Centralized configuration loading and access.
-- **Exports:** `Configuration`, `LoadConfiguration()`, `GetConfigPath()`, `AppConfig`.
-- **Interactions:** Used by all modules.
-- **Example:**
-  ```go
-  import "github.com/organization/service-seed/packages/config"
-  err := config.LoadConfiguration()
-  ```
+**Logging** - Structured logging with optional OpenTelemetry export (stdout + file + OTLP)
 
-### [logger](./packages/logger/README.md)
-- **Purpose:** Centralized logging utilities for file/stdout and levels.
-- **Exports:** `InitLogger()`, `CloseLogger()`, `Debug`, `Info`, `Warn`, `Error`, `Fatal`.
-- **Interactions:** Used by all modules.
-- **Example:**
-  ```go
-  import "github.com/organization/service-seed/packages/logger"
-  logger.InitLogger("/var/log/service-seed", "info")
-  logger.Info("Started")
-  ```
+**Metrics** - Prometheus metrics with optional OTLP push export, HTTP middleware for automatic instrumentation
 
-### [stats](./packages/stats/README.md)
-- **Purpose:** Metrics and statistics tracking, Prometheus counters, system state.
-- **Exports:** `InitMetrics()`, `FileSystemInfo`, `GenerateState()`, `GetFileSystemInfo()`
-- **Interactions:** Uses `config`, `consul`.
-- **Example:**
-  ```go
-  import "github.com/organization/service-seed/packages/stats"
-  stats.InitMetrics()
-  ```
+**Tracing** - Distributed tracing via OpenTelemetry with configurable sampling
 
----
+**CLI** - Cobra-based command-line interface with extensible command structure
 
-For detailed module documentation, see each module's README.
+**Docker** - Multi-registry support (GCP Artifact Registry, Docker Hub, AWS ECR) with security best practices
+
+## Project Structure
+
+```
+packages/
+├── api/          HTTP server and REST endpoints
+├── bootstrap/    Filesystem initialization
+├── cli/          Command-line interface
+├── config/       HCL configuration management
+├── logger/       Centralized logging with OTLP support
+└── stats/        Metrics, middleware, and tracing
+```
+
+## Documentation
+
+- **[CLAUDE.md](./CLAUDE.md)** - Architecture guide for AI assistants working on this codebase
+- **Package CLAUDELETs** - Each package has a `CLAUDELET.md` with implementation details:
+  - [api/CLAUDELET.md](./packages/api/CLAUDELET.md)
+  - [bootstrap/CLAUDELET.md](./packages/bootstrap/CLAUDELET.md)
+  - [cli/CLAUDELET.md](./packages/cli/CLAUDELET.md)
+  - [config/CLAUDELET.md](./packages/config/CLAUDELET.md)
+  - [logger/CLAUDELET.md](./packages/logger/CLAUDELET.md)
+  - [stats/CLAUDELET.md](./packages/stats/CLAUDELET.md)
+
+## Configuration
+
+Edit `config.hcl` or set `SS_CONFIG_FILE_PATH` environment variable:
+
+```hcl
+log_dir = "logs"
+data_dir = "data"
+
+server {
+  port = "8080"
+  address = "0.0.0.0"
+}
+
+# Optional: Enable OpenTelemetry export
+telemetry {
+  endpoint = "localhost:4317"
+
+  metrics { enabled = true }
+  logs { enabled = true }
+  traces { enabled = true }
+}
+```
+
+## Customizing for Your Service
+
+1. Update module path in `go.mod`
+2. Change `APP_NAME` in `GNUmakefile`
+3. Update import paths throughout codebase
+4. Modify package logic for your use case
+5. Update CLAUDELETs to document your changes
+
+See [CLAUDE.md](./CLAUDE.md) for detailed customization instructions.
