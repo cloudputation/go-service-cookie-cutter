@@ -17,7 +17,7 @@ import (
 	semconv "go.opentelemetry.io/otel/semconv/v1.24.0"
 	"google.golang.org/grpc/credentials"
 
-	"github.com/behavox/application-boilerplate/packages/config"
+	"github.com/cloudputation/service-seed/packages/config"
 )
 
 const meterName = "service-seed"

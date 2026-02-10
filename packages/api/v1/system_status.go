@@ -5,18 +5,15 @@ import (
 		"fmt"
 		"net/http"
 
-		"github.com/organization/service-seed/packages/config"
-		"github.com/organization/service-seed/packages/consul"
-		"github.com/organization/service-seed/packages/stats"
-		l "github.com/organization/service-seed/packages/logger"
+		"github.com/cloudputation/service-seed/packages/config"
+		"github.com/cloudputation/service-seed/packages/stats"
+		log "github.com/cloudputation/service-seed/packages/logger"
 )
 
-type FileSystemStatus struct {
-	Status string `json:"filesystem-status"`
-}
-
-type SystemStatusResponseBody struct {
-	Message string `json:"message"`
+type SystemStatusResponse struct {
+	Status  string `json:"status"`
+	DataDir string `json:"data_dir"`
+	LogDir  string `json:"log_dir"`
 }
 
 func SystemStatusHandlerWrapper(w http.ResponseWriter, r *http.Request) {
@@ -25,43 +22,28 @@ func SystemStatusHandlerWrapper(w http.ResponseWriter, r *http.Request) {
 
 func SystemStatusHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
-      err := http.StatusMethodNotAllowed
-      l.Error("Received an invalid request method: %v", err)
-      stats.ErrorCounter.Add(r.Context(), 1)
-			http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
-			return
+		err := http.StatusMethodNotAllowed
+		log.Error("Received an invalid request method: %v", err)
+		stats.ErrorCounter.Add(r.Context(), 1)
+		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
+		return
 	}
 	stats.SystemStatusEndpointCounter.Add(r.Context(), 1)
 
-	filesystemDataPath := config.ConsulFileSystemDataDir
-	statusPath := fmt.Sprintf("%s/status", filesystemDataPath)
-
-	consulFileSystemStatus, err := consul.ConsulStoreGet(statusPath)
-	if err != nil {
-			l.Error("Failed to fetch filesystem state: "+err.Error(), http.StatusInternalServerError)
-			stats.ErrorCounter.Add(r.Context(), 1)
-			http.Error(w, "Failed to fetch filesystem state: "+err.Error(), http.StatusInternalServerError)
-			return
+	// Build simple system status response
+	response := SystemStatusResponse{
+		Status:  "running",
+		DataDir: config.AppConfig.DataDir,
+		LogDir:  config.AppConfig.LogDir,
 	}
 
-	consulFileSystemStatusBytes, err := json.Marshal(consulFileSystemStatus)
-	if err != nil {
-			l.Error("Error marshaling map to JSON: %v", err)
-			stats.ErrorCounter.Add(r.Context(), 1)
-			http.Error(w, "Failed to marshal map to JSON", http.StatusInternalServerError)
-			return
+	w.Header().Set("Content-Type", "application/json")
+	if err := json.NewEncoder(w).Encode(response); err != nil {
+		log.Error("Failed to encode system status response: %v", err)
+		stats.ErrorCounter.Add(r.Context(), 1)
+		http.Error(w, "Failed to encode response", http.StatusInternalServerError)
+		return
 	}
 
-	var status FileSystemStatus
-	err = json.Unmarshal(consulFileSystemStatusBytes, &status)
-	if err != nil {
-			l.Error("Error unmarshaling JSON: %v", err)
-			stats.ErrorCounter.Add(r.Context(), 1)
-			http.Error(w, "Failed to unmarshal JSON", http.StatusInternalServerError)
-			return
-	}
-
-
-	w.Header().Set("Content-Type", "text/plain")
-  fmt.Fprintf(w, status.Status)
+	log.Info("System status request completed successfully")
 }

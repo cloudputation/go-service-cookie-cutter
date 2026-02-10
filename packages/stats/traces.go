@@ -14,7 +14,7 @@ import (
 	"go.opentelemetry.io/otel/trace"
 	"google.golang.org/grpc/credentials"
 
-	"github.com/behavox/application-boilerplate/packages/config"
+	"github.com/cloudputation/service-seed/packages/config"
 )
 
 // tracerProvider holds the provider for graceful shutdown

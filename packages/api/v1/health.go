@@ -3,14 +3,14 @@ package v1
 import (
     "net/http"
 
-    l "github.com/organization/service-seed/packages/logger"
-    "github.com/organization/service-seed/packages/stats"
+    log "github.com/cloudputation/service-seed/packages/logger"
+    "github.com/cloudputation/service-seed/packages/stats"
 )
 
 
 func HealthHandler(w http.ResponseWriter, r *http.Request) {
   if r.Method != http.MethodGet {
-      l.Error("HealthHandler: invalid request method")
+      log.Error("HealthHandler: invalid request method")
       stats.ErrorCounter.Add(r.Context(), 1)
       http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
       return

@@ -6,10 +6,10 @@ import (
 	"os"
 	"time"
 
-	"github.com/organization/service-seed/packages/cli"
-	"github.com/organization/service-seed/packages/config"
-	log "github.com/organization/service-seed/packages/logger"
-	"github.com/organization/service-seed/packages/stats"
+	"github.com/cloudputation/service-seed/packages/cli"
+	"github.com/cloudputation/service-seed/packages/config"
+	log "github.com/cloudputation/service-seed/packages/logger"
+	"github.com/cloudputation/service-seed/packages/stats"
 )
 
 func main() {

@@ -1,15 +1,12 @@
 package cli
 
 import (
-	"context"
 	"github.com/spf13/cobra"
 
-	"github.com/organization/service-seed/packages/bootstrap"
-	l "github.com/organization/service-seed/packages/logger"
-	"github.com/organization/service-seed/packages/api"
-	"github.com/organization/service-seed/packages/stats"
+	"github.com/cloudputation/service-seed/packages/api"
+	"github.com/cloudputation/service-seed/packages/bootstrap"
+	log "github.com/cloudputation/service-seed/packages/logger"
 )
-
 
 func SetupRootCommand() *cobra.Command {
 	var rootCmd = &cobra.Command{
@@ -24,7 +21,7 @@ func SetupRootCommand() *cobra.Command {
 		Run: func(cmd *cobra.Command, args []string) {
 			err := bootstrap.BootstrapFileSystem()
 			if err != nil {
-				l.Fatal("Failed to bootstrap the filesystem: %v", err)
+				log.Fatal("Failed to bootstrap the filesystem: %v", err)
 			}
 			api.StartServer()
 		},
